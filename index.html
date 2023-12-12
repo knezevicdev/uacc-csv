@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <script src="/xlsx.full.min.js"></script>
+    <title>UACC CSV Generator</title>
+</head>
+<body>
+<h1>UACC CSV Generator</h1>
+<input type="file" id="fileinput">
+<button id="submit">Generate</button>
+
+<script>
+    (() => {
+        async function loadFileAndGenerateCsv(file) {
+            const data = await file.arrayBuffer();
+            const workbook = XLSX.read(data);
+
+            const worksheet = workbook.Sheets[workbook.SheetNames[0]];
+
+            const jsa = XLSX.utils.sheet_to_json(worksheet);
+
+            let csv = 'F0132_CROSS_KEY,F0157_NOTE_DATE,F0184_ACCOUNT_STATUS,F0145_LOAN_BALANCE,POT DPD,POT_BUCKET,F0212_VIN,F0376_MODEL_YEAR,F0696_MAKE_DESCRIPTION,F0697_MODEL_DESCRIPTION,F0698_MODEL_DETAIL,EST_MILES,CUST ZIP';
+            csv += '\n';
+
+            for (let i = 0; i < jsa.length; i++) {
+                const row = jsa[i];
+                csv += [
+                    '',
+                    '',
+                    '',
+                    '',
+                    '',
+                    '',
+                    `"${row['F0212_VIN'].toUpperCase().replace('I', '1').replace('O', '0').replace('Q', '0')}"`,
+                    `"${row['F0376_MODEL_YEAR']}"`,
+                    `"${row['F0696_MAKE_DESCRIPTION']}"`,
+                    `"${row['F0697_MODEL_DESCRIPTION']}"`,
+                    `"${row['F0698_MODEL_DETAIL']}"`,
+                    `"${row['EST_MILES']}"`,
+                    `"${row['CUST ZIP'] || 35000}"`
+                ]
+                csv += '\n';
+            }
+
+            const blob = new Blob([csv], {type: 'text/csv'});
+            const link = document.createElement('a');
+            link.href = window.URL.createObjectURL(blob);
+            // uacc + date.csv
+            link.download = `uacc-${new Date().toISOString().split('T')[0]}.csv`;
+            link.click();
+        }
+
+        const input_dom_element = document.getElementById("fileinput");
+
+        const button = document.getElementById("submit");
+
+        button.addEventListener('click', () => {
+            const file = input_dom_element.files[0];
+            if (file) {
+                if (!file.name.endsWith('.xlsx')) {
+                    alert('Please select a valid excel file');
+                    return;
+                }
+                loadFileAndGenerateCsv(file);
+            } else {
+                alert('Please select a file');
+            }
+        });
+    })();
+</script>
+</body>
+</html>
