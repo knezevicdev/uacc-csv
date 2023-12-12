@@ -37,12 +37,12 @@
                     '',
                     `"${row['F0212_VIN'].toUpperCase().replace('I', '1').replace('O', '0').replace('Q', '0')}"`,
                     `"${row['F0376_MODEL_YEAR']}"`,
-                    `"${row['F0696_MAKE_DESCRIPTION']}"`,
-                    `"${row['F0697_MODEL_DESCRIPTION']}"`,
-                    `"${row['F0698_MODEL_DETAIL']}"`,
-                    `"${row['EST_MILES']}"`,
-                    `"${row['CUST ZIP'] || 35000}"`
-                ]
+                    `"${row['F0696_MAKE_DESCRIPTION']?.replaceAll('"', "") || ''}"`,
+                    `"${row['F0697_MODEL_DESCRIPTION']?.replaceAll('"', "") || ''}"`,
+                    `"${row['F0698_MODEL_DETAIL']?.replaceAll('"', "") || ''}"`,
+                    `"${row['EST_MILES'] || 35000}"`,
+                    `"${row['CUST ZIP']}"`
+                ].join(',');
                 csv += '\n';
             }
 
